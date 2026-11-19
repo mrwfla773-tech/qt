@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#150e08" />
+<title>秋天工坊 · 验证</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg1: #150e08;
+    --bg2: #1f1509;
+    --gold: #ff9d42;
+    --gold-2: #ffc078;
+    --maple: #d9502a;
+    --text: #f6ead9;
+    --muted: #b39a7e;
+    --card: rgba(38, 26, 15, .78);
+    --line: rgba(255, 157, 66, .22);
+  }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background:
+      radial-gradient(900px 520px at 12% -8%, rgba(217, 80, 42, .28), transparent 62%),
+      radial-gradient(760px 480px at 92% 8%, rgba(255, 157, 66, .22), transparent 60%),
+      radial-gradient(700px 700px at 50% 118%, rgba(160, 78, 20, .22), transparent 62%),
+      linear-gradient(168deg, var(--bg1), var(--bg2) 58%, #120c07);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  /* 飘落的秋叶 */
+  .leaves { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .leaf {
+    position: absolute; top: -8vh; width: 12px; height: 12px;
+    background: linear-gradient(140deg, #ffb066, #c0441f);
+    border-radius: 12px 2px 12px 2px;
+    opacity: .32;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+    10%  { opacity: .35; }
+    100% { transform: translate3d(60px, 112vh, 0) rotate(420deg); opacity: 0; }
+  }
+
+  .wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; }
+
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .logo {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: linear-gradient(145deg, #ffb468, #d9502a);
+    display: grid; place-items: center;
+    font-size: 22px; font-weight: 700; color: #2a1608;
+    box-shadow: 0 10px 26px rgba(217, 80, 42, .35);
+  }
+  .brand h1 { font-size: 19px; margin: 0; letter-spacing: .5px; font-weight: 650; }
+  .brand p { margin: 3px 0 0; font-size: 12px; color: var(--muted); letter-spacing: .6px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 26px 22px 24px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 26px 60px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 220, 180, .07);
+  }
+  .card h2 { margin: 0 0 6px; font-size: 17px; font-weight: 650; }
+  .card .sub { margin: 0 0 20px; font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+
+  .field { position: relative; margin-bottom: 14px; }
+  input[type="text"] {
+    width: 100%;
+    padding: 16px 16px;
+    font-size: 16px;
+    letter-spacing: 1.6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+    color: var(--text);
+    background: rgba(12, 8, 4, .55);
+    border: 1px solid rgba(255, 157, 66, .25);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+  }
+  input[type="text"]::placeholder { color: #7d6550; letter-spacing: 1px; }
+  input[type="text"]:focus {
+    border-color: rgba(255, 157, 66, .7);
+    box-shadow: 0 0 0 4px rgba(255, 157, 66, .12);
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    font-size: 15.5px;
+    font-weight: 650;
+    color: #2a1608;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold) 55%, #e8791f);
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform .12s, filter .18s, opacity .18s;
+    box-shadow: 0 12px 28px rgba(255, 140, 40, .26);
+  }
+  button:active { transform: scale(.985); }
+  button:disabled { opacity: .55; cursor: default; filter: grayscale(.2); }
+
+  .msg {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 11px 13px;
+    border-radius: 12px;
+    display: none;
+  }
+  .msg.show { display: block; }
+  .msg.err { color: #ffc4b0; background: rgba(217, 80, 42, .16); border: 1px solid rgba(217, 80, 42, .35); }
+  .msg.ok { color: #ffe0b4; background: rgba(255, 157, 66, .14); border: 1px solid rgba(255, 157, 66, .3); }
+
+  .foot {
+    margin-top: 18px; text-align: center;
+    font-size: 11.5px; color: #8a7358; line-height: 1.8;
+  }
+  .foot a { color: #b98d5e; text-decoration: none; }
+  .foot a:hover { color: var(--gold); }
+
+  .banner {
+    display: none;
+    margin-bottom: 16px; padding: 11px 13px; border-radius: 12px;
+    font-size: 12.5px; color: #ffe0b4;
+    background: rgba(255, 157, 66, .1);
+    border: 1px dashed rgba(255, 157, 66, .4);
+  }
+  .banner.show { display: block; }
+
+  .hidden { display: none !important; }
+  .enter-tip { margin-top: 12px; font-size: 12px; color: var(--muted); text-align: center; display: none; }
+  .enter-tip.show { display: block; }
+</style>
+</head>
+<body>
+<div class="leaves" id="leaves"></div>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="logo">秋</div>
+    <div>
+      <h1 id="brandTitle">秋天工坊</h1>
+      <p>存档管理台 · 卡密验证</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="banner" id="publicBanner">站点现在是公益状态，直接进入即可 —— 点下面的按钮进去。</div>
+
+    <h2 id="cardTitle">输入卡密进入</h2>
+    <p class="sub" id="cardSub">卡密由管理员发放，激活后自动开始计算时间。一张卡对应一台设备使用。</p>
+
+    <form id="form" autocomplete="off">
+      <div class="field" id="codeField">
+        <input id="code" type="text" inputmode="text" spellcheck="false"
+               placeholder="QWERTY-ABCD-EFGH-IJKL" maxlength="48" />
+      </div>
+      <button id="submit" type="submit">验证并进入</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+    <div class="enter-tip" id="enterTip"><a href="/" style="color:#b98d5e">进入站点 →</a></div>
+  </div>
+
+  <div class="foot">
+    有问题找发卡的人 · <a href="/admin">管理入口</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  // 落叶
+  var box = document.getElementById('leaves');
+  for (var i = 0; i < 14; i++) {
+    var d = document.createElement('div');
+    d.className = 'leaf';
+    d.style.left = (Math.random() * 100) + '%';
+    d.style.animationDuration = (9 + Math.random() * 9) + 's';
+    d.style.animationDelay = (-Math.random() * 14) + 's';
+    d.style.width = d.style.height = (8 + Math.random() * 9) + 'px';
+    d.style.opacity = (0.15 + Math.random() * 0.25).toFixed(2);
+    box.appendChild(d);
+  }
+
+  var form = document.getElementById('form');
+  var input = document.getElementById('code');
+  var btn = document.getElementById('submit');
+  var msg = document.getElementById('msg');
+  var codeField = document.getElementById('codeField');
+  var cardTitle = document.getElementById('cardTitle');
+  var cardSub = document.getElementById('cardSub');
+  var banner = document.getElementById('publicBanner');
+  var enterTip = document.getElementById('enterTip');
+  var publicMode = false;
+
+  function show(text, kind) {
+    msg.textContent = text;
+    msg.className = 'msg show ' + (kind || 'err');
+  }
+
+  fetch('/api/gate/status', { credentials: 'same-origin' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.title) document.getElementById('brandTitle').textContent = d.title;
+      publicMode = !!d.publicMode;
+      if (d.authorized) { location.replace('/'); return; }
+      if (publicMode) {
+        banner.classList.add('show');
+        cardTitle.textContent = '公益开放中';
+        cardSub.textContent = '现在不需要卡密，点下面按钮直接进入。';
+        codeField.classList.add('hidden');
+        btn.textContent = '直接进入';
+      }
+    })
+    .catch(function () {});
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (publicMode) { location.replace('/'); return; }
+
+    var code = (input.value || '').trim();
+    if (!code) { show('先填卡密'); input.focus(); return; }
+
+    btn.disabled = true;
+    var old = btn.textContent;
+    btn.textContent = '验证中…';
+    show('', 'ok');
+    msg.className = 'msg';
+
+    fetch('/api/gate/verify', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code }),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+      .then(function (x) {
+        if (x.d && x.d.ok) {
+          show('验证通过，正在进入…', 'ok');
+          setTimeout(function () { location.replace('/'); }, 350);
+          return;
+        }
+        show((x.d && x.d.message) || '验证失败，检查一下卡密');
+        btn.disabled = false;
+        btn.textContent = old;
+      })
+      .catch(function () {
+        show('网络连不上，稍后再试');
+        btn.disabled = false;
+        btn.textContent = old;
+      });
+  });
+
+  input.addEventListener('input', function () {
+    var v = input.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+    if (v !== input.value) input.value = v;
+  });
+})();
+</script>
+</body>
+</html>
